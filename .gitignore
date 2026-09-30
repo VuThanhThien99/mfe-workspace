@@ -1,0 +1,15 @@
+# Sibling product repos (each has its own git root)
+mfe-*/
+
+# OS / editor
+.DS_Store
+.vscode/
+
+# Generated / heavy local artifacts
+repomix-output.*
+*.log
+
+# Accidental env at workspace root
+.env
+.env.*
+!.env.example
