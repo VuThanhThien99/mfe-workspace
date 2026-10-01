@@ -18,7 +18,7 @@ You can skip this repo and clone any `mfe-*` alone — each still runs per its o
 git clone https://github.com/VuThanhThien99/mfe-workspace.git
 cd mfe-workspace
 ./bootstrap.sh            # or: make bootstrap
-make up                   # full Docker mesh + MinIO → http://localhost:8080
+make up                   # full Docker mesh → http://localhost:8080
 make -C mfe-backend seed  # first boot / empty DB
 ```
 
@@ -31,7 +31,7 @@ make dev                  # hybrid: infra + gateway → host.docker.internal
 
 If old `mfe-platform-*` containers still hold ports: `make legacy-down` (if present) or stop them manually.
 
-MinIO comes with `make up` via `make -C mfe-backend assets-up` (`:9000`, bucket `mfe-assets`).  
+Assets default to whatever `ASSETS_S3_*` is in `mfe-backend/.env` (e.g. R2). Local MinIO is opt-in: `make assets-local-up` (`:9000` / console `:9001`, bucket `mfe-assets`; stop with `make assets-local-down`). Admin image previews use build-time `VITE_ASSET_BASE_URL` (set in `mfe-remote-admin/.env` for R2 custom domain; rebuild after change).  
 E2e (mesh up): `make -C mfe-gateway e2e`
 
 ## Docs

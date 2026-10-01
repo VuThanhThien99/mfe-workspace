@@ -1,8 +1,9 @@
 # Workspace orchestrator (mfe-workspace) — fans out to sibling repos on mfe-net
 #
-#   make up     → full Docker mesh → http://localhost:8080
-#   make dev    → hybrid: backend infra + host apps + hybrid gateway
-#   make down   → tear down all project containers (keeps mfe-net + volumes)
+#   make up               → full Docker mesh → http://localhost:8080
+#   make assets-local-up  → local MinIO (:9000 / console :9001) — opt-in
+#   make dev              → hybrid: backend infra + host apps + hybrid gateway
+#   make down             → tear down all project containers (keeps mfe-net + volumes)
 #
 # Specs: plans/  | docs: docs/README.md
 
@@ -24,7 +25,7 @@ ALL_REPOS := $(BACKEND) $(FE_REPOS) $(SHELL_REPO) $(GATEWAY)
 .DEFAULT_GOAL := help
 
 .PHONY: help ensure-network clean-network check-repos up down ps logs \
-	dev bootstrap legacy-down
+	dev bootstrap legacy-down assets-local-up assets-local-down
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage: make \033[36m<target>\033[0m\n\n"} \
@@ -63,8 +64,6 @@ up: check-repos ensure-network ## Full Docker mesh → :8080
 	fi
 	@echo "→ backend"
 	@$(MAKE) -C $(BACKEND) up
-	@echo "→ minio (assets)"
-	@$(MAKE) -C $(BACKEND) assets-up
 	@echo "→ frontends (sequential — avoids make job-control races under parallel &)"
 	@for d in $(FE_REPOS); do \
 	  echo "  · $$(basename $$d)"; \
@@ -76,8 +75,14 @@ up: check-repos ensure-network ## Full Docker mesh → :8080
 	@$(MAKE) -C $(GATEWAY) up
 	@echo ""
 	@echo "✓ Mesh up → http://localhost:8080"
-	@echo "  MinIO: http://localhost:9000  (bucket mfe-assets)"
+	@echo "  Assets: ASSETS_S3_* in mfe-backend/.env (R2), or: make assets-local-up"
 	@echo "  Seeds: cd mfe-backend && make seed  (or RUN_SEEDS=true make -C mfe-backend up)"
+
+assets-local-up: ensure-network ## Local MinIO + bucket seed (:9000 / console :9001)
+	@$(MAKE) -C $(BACKEND) assets-up
+
+assets-local-down: ## Stop local MinIO (leave the rest of the mesh)
+	@$(MAKE) -C $(BACKEND) assets-down
 
 down: ## Stop all sibling compose projects (keep network + volumes)
 	-$(MAKE) -C $(GATEWAY) down
