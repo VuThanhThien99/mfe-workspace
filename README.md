@@ -7,7 +7,7 @@ Thin orchestrator for the VuThanhThien99 MFE polyrepo. **This repo versions only
 | `mfe-backend` | Postgres, Redis, API, optional MinIO |
 | `mfe-shell` | Authenticated Vite host app |
 | `mfe-gateway` | nginx edge, platform docs, Helm, Playwright e2e |
-| `mfe-landing`, `mfe-remote-*` | Each app’s image / `pnpm\|npm` dev |
+| `mfe-landing`, `mfe-remote-*` | Each app’s image / `pnpm` dev |
 | `mfe-shared` | Packages only (no compose) |
 
 You can skip this repo and clone any `mfe-*` alone — each still runs per its own README.
