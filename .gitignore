@@ -3,7 +3,8 @@ mfe-*/
 
 # OS / editor
 .DS_Store
-.vscode/
+.vscode/*
+!.vscode/settings.json
 
 # Generated / heavy local artifacts
 repomix-output.*
@@ -13,3 +14,6 @@ repomix-output.*
 .env
 .env.*
 !.env.example
+.cursor/
+.vscode/
+mfe-workspace.code-workspace

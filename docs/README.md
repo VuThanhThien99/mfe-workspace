@@ -13,6 +13,7 @@ This repo (`mfe-workspace`) is the **orchestrator shell** only. Docs are split b
 
 - [Local development guide](../mfe-gateway/docs/local-development-guide.md)
 - [System architecture](../mfe-gateway/docs/system-architecture.md)
+- [Cloudflare Tunnel (home demo)](../mfe-gateway/docs/cloudflare-tunnel.md)
 - [Backend README](../mfe-backend/README.md)
 
 Paths above resolve only once siblings are cloned (`./bootstrap.sh`).

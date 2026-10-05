@@ -34,6 +34,8 @@ If old `mfe-platform-*` containers still hold ports: `make legacy-down` (if pres
 Assets default to whatever `ASSETS_S3_*` is in `mfe-backend/.env` (e.g. R2). Local MinIO is opt-in: `make assets-local-up` (`:9000` / console `:9001`, bucket `mfe-assets`; stop with `make assets-local-down`). Admin image previews use build-time `VITE_ASSET_BASE_URL` (set in `mfe-remote-admin/.env` for R2 custom domain; rebuild after change).  
 E2e (mesh up): `make -C mfe-gateway e2e`
 
+Opt-in public demo: `make tunnel-up` — [Cloudflare Tunnel runbook](./mfe-gateway/docs/cloudflare-tunnel.md) (after bootstrap).
+
 ## Docs
 
 - Doc ownership index: [`docs/README.md`](./docs/README.md)

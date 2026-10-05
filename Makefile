@@ -3,6 +3,7 @@
 #   make up               → full Docker mesh → http://localhost:8080
 #   make assets-local-up  → local MinIO (:9000 / console :9001) — opt-in
 #   make dev              → hybrid: backend infra + host apps + hybrid gateway
+#   make tunnel-up        → opt-in Cloudflare Tunnel → https://app.longnhanhungyen.shop
 #   make down             → tear down all project containers (keeps mfe-net + volumes)
 #
 # Specs: plans/  | docs: docs/README.md
@@ -25,12 +26,14 @@ ALL_REPOS := $(BACKEND) $(FE_REPOS) $(SHELL_REPO) $(GATEWAY)
 .DEFAULT_GOAL := help
 
 .PHONY: help ensure-network clean-network check-repos up down ps logs \
-	dev bootstrap legacy-down assets-local-up assets-local-down
+	dev bootstrap legacy-down assets-local-up assets-local-down \
+	tunnel-up tunnel-down
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage: make \033[36m<target>\033[0m\n\n"} \
 		/^[a-zA-Z0-9_-]+:.*?##/ { printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
-	@printf "\nMesh: \033[33mhttp://localhost:8080\033[0m\n\n"
+	@printf "\nMesh: \033[33mhttp://localhost:8080\033[0m\n"
+	@printf "Public demo: \033[33mhttps://app.longnhanhungyen.shop\033[0m (make tunnel-up)\n\n"
 
 check-repos: ## Abort if a sibling clone is missing
 	@missing=""; \
@@ -83,6 +86,12 @@ assets-local-up: ensure-network ## Local MinIO + bucket seed (:9000 / console :9
 
 assets-local-down: ## Stop local MinIO (leave the rest of the mesh)
 	@$(MAKE) -C $(BACKEND) assets-down
+
+tunnel-up: ## Opt-in Cloudflare Tunnel → https://app.longnhanhungyen.shop
+	@$(MAKE) -C $(GATEWAY) tunnel-up
+
+tunnel-down: ## Stop Cloudflare Tunnel only
+	@$(MAKE) -C $(GATEWAY) tunnel-down
 
 down: ## Stop all sibling compose projects (keep network + volumes)
 	-$(MAKE) -C $(GATEWAY) down
