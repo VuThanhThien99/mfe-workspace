@@ -10,7 +10,7 @@ Mỗi remote đang tự khai báo path. Thêm page dễ lệch giữa nơi đị
 
 ## User stories
 
-- Admin mở `/app/admin/scopes`, thấy đúng hai scope constant. Không tạo, sửa, xóa scope.
+- Admin gán scope + permission trên `/app/admin/users` (không còn section `/scopes`).
 - Admin mở `DASHBOARD` và gán permission cho từng user board bằng cây checkbox.
 - Admin mở một user `ADMIN` thì không thấy cây permission.
 - Admin trên `/app/admin/users` đổi được scope của user và, nếu scope là `DASHBOARD`, gán permission bằng cùng một cây.
@@ -66,10 +66,8 @@ mfe-backend
   /users/me → permissions[]
 
 mfe-remote-admin
-  /scopes                         list 2 constant
-  /scopes/dashboard/permissions   gán theo user
-  /scopes/admin                   giải thích bypass, không có cây
   /users, /users/new, /users/:id  sửa scope + cây khi DASHBOARD
+  (không còn /scopes — gán permission chỉ trên form user)
 
 product, formengine, vue
   dựng router từ catalog + map component cục bộ
@@ -121,9 +119,6 @@ Seed (path lấy từ router hiện tại). `route.id` unique theo path. Cột P
 | admin | `users` | `admin.users.read` | false |
 | admin | `users/new` | `admin.users.write` | false |
 | admin | `users/:id` | `admin.users.write` | false |
-| admin | `scopes` | `admin.scopes.read` | false |
-| admin | `scopes/dashboard/permissions` | `admin.permissions.assign` | false |
-| admin | `scopes/admin` | `admin.scopes.read` | false |
 | admin | `configs` | `admin.configs.read` | false |
 | admin | `configs/new` | `admin.configs.write` | false |
 | admin | `configs/:id` | `admin.configs.write` | false |
@@ -290,7 +285,7 @@ Fail closed khi status đã `ready` và không có `ADMIN`.
 
 ### Remote
 
-Mỗi remote: mọi route catalog của remote đó có component map. Admin: user `ADMIN` không có cây; save `DASHBOARD` chỉ gửi leaf; `/scopes` không còn create/delete scope.
+Mỗi remote: mọi route catalog của remote đó có component map. Admin: user `ADMIN` không có cây; save `DASHBOARD` chỉ gửi leaf; gán quyền chỉ trên form user.
 
 ### E2E một luồng
 
