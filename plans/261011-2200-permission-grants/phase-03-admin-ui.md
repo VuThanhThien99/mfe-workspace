@@ -6,31 +6,28 @@
 - [phase-02-backend.md](./phase-02-backend.md)
 - Routes: `mfe-remote-admin/src/routes/admin-routes.tsx`
 - Users: `mfe-remote-admin/src/pages/users/`
-- Scopes: `mfe-remote-admin/src/pages/scopes/`
 - Tree docs: https://mui.com/x/react-tree-view/simple-tree-view/selection/#checkbox-selection
+- **Post-ship:** `/scopes` section removed — grants only on user create/edit. Catalog `admin.*` is `assignable: false`.
 
 ## Overview
 
 - Priority: P1
 - Status: Done
 - Effort: 5h
-- Thay CRUD scope bằng hai constant. Gán permission bằng cây checkbox. User form sửa scope và permission.
+- Scope chỉ còn `ADMIN` | `DASHBOARD` trên user form. Gán permission bằng cây checkbox (board remotes only).
 
 ## Key Insights
 
-- Một component cây dùng ở user form và ở màn dashboard permissions.
-- Payload chỉ leaf id. Parent id không gửi.
+- Một `PermissionTree` trên user create/edit.
+- Payload chỉ leaf id. Parent id không gửi. Admin group không vào cây.
 - User `ADMIN`: không mount cây, không gửi field `permissions`.
 - Chuyển `ADMIN` → `DASHBOARD`: cây mở với grant đang lưu (API trả về dù runtime đang bỏ qua).
 
 ## Requirements
 
-- `/scopes` list `ADMIN` và `DASHBOARD`. Không nút create/delete/rename.
-- `/scopes/dashboard/permissions` list user scope đó, mỗi user một cây, save bằng `PATCH`.
-- `/scopes/admin` chỉ giải thích bypass.
 - `/users/new` và `/users/:id`: chọn đúng một scope. `DASHBOARD` hiện cây. `ADMIN` ẩn cây.
 - Save `DASHBOARD` gửi full leaf selection (replace).
-- Route admin lấy path từ catalog + map component. Bỏ `scopes/new` và `scopes/:id`.
+- Route admin lấy path từ catalog + map component (không còn `/scopes`).
 - Nút xóa user bọc `<Can permission="admin.users.delete">`.
 - Deep link thiếu quyền → Forbidden.
 

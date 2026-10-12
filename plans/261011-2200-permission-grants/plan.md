@@ -1,13 +1,13 @@
 ---
 title: "Permission grants"
 description: "Catalog permission dùng chung, gán cho user board, gate route và API."
-status: spec-complete
+status: complete
 priority: P1
 effort: 26h
 branch: main
 tags: [feature, auth, frontend, backend, api]
 created: 2026-10-11
-progress: "7 of 7 phases (100% spec-complete; mesh verification pending)"
+progress: "7 of 7 phases (100%; e2e 5/5 + localhost mesh verified)"
 ---
 
 # Permission grants
@@ -28,7 +28,7 @@ Spec: [design-spec.md](./design-spec.md)
 | 4 | Product routes | Done | 3h | `mfe-remote-product/**` | [phase-04](./phase-04-product.md) |
 | 5 | Formengine modes | Done | 3h | `mfe-remote-formengine/**` | [phase-05](./phase-05-formengine.md) |
 | 6 | Vue routes | Done | 2h | `mfe-remote-vue/**` | [phase-06](./phase-06-vue.md) |
-| 7 | E2E | Done* | 3h | `mfe-gateway/e2e/**` | [phase-07](./phase-07-e2e.md) |
+| 7 | E2E | Done | 3h | `mfe-gateway/e2e/**` | [phase-07](./phase-07-e2e.md) |
 
 ## Dependency graph
 
