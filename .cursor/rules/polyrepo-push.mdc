@@ -1,0 +1,69 @@
+---
+description: When user says "push", review/commit/push all dirty polyrepos, publish mfe-shared, bump consumers
+alwaysApply: true
+---
+
+# Polyrepo "push" workflow
+
+When the user says **push** (or "push all" / "workspace push") in this workspace, treat it as an explicit request to **review → quality-gate → commit → push** every dirty sibling repo. Do not ask for a second confirm to commit/push.
+
+## Repos (each is its own git root)
+
+`mfe-shared`, `mfe-backend`, `mfe-shell`, `mfe-landing`, `mfe-gateway`, `mfe-remote-admin`, `mfe-remote-product`, `mfe-remote-formengine`, `mfe-remote-vue`, and workspace root (`mfe-workspace` orchestrator only).
+
+## Order
+
+1. Scan **all** repos: `git status -sb` + `git diff` / `git diff --cached`.
+2. Summarize dirty repos and intended commits (brief review to user).
+3. Process **`mfe-shared` first** if it has package changes (publish before consumers).
+4. Then other dirty product repos.
+5. Bump + commit + push any consumers that need the new shared versions.
+6. Workspace root last if dirty.
+
+Skip clean repos. Stop on first failing quality gate or publish failure.
+
+## Per-repo quality gates (run from that repo root)
+
+Run every script that exists; skip missing ones. Prefer `pnpm`:
+
+| Gate | Scripts |
+|------|---------|
+| Format | `pnpm format` then `pnpm format:check` |
+| Lint | `pnpm lint` (or `pnpm exec eslint .` if lint script missing but eslint present) |
+| Types | `pnpm typecheck` |
+| Unit tests | `pnpm test` |
+| Build | `pnpm build` — **required** for changed `mfe-shared/packages/*` before tag |
+
+Do **not** run gateway Playwright e2e / backend e2e / Docker mesh unless the user asks. Do **not** use `--no-verify`. Scan staged diffs for secrets before commit.
+
+Commits: conventional commits (`feat|fix|chore|refactor|docs|test|perf`), concise why-focused message. Push with `git push -u origin HEAD` if no upstream.
+
+## mfe-shared publish (when packages changed)
+
+Packages: `sdk`, `ui`, `interfaces`, `eform` → `@vuthanhthien99/{name}` on GitHub Packages.
+
+1. Identify which `packages/*` actually changed.
+2. Bump **semver in that package's `package.json`** (default **patch**; minor/major only if user said so or change is clearly breaking).
+3. Quality-gate that package (`format`/`lint`/`typecheck`/`test`/`build`).
+4. Commit + push `mfe-shared` `main`.
+5. Tag + push tags (one tag per published package; tag must match version):
+   - `sdk-vX.Y.Z`, `ui-vX.Y.Z`, `eform-vX.Y.Z`, `interfaces-vX.Y.Z`
+6. **Release order:** publish **sdk before ui**. `interfaces` / `eform` independent.
+7. Wait until publish succeeds (Actions on tag, or `npm view @vuthanhthien99/<pkg>@X.Y.Z --registry https://npm.pkg.github.com`). Do not bump consumers until the version is visible.
+
+## Consumer bumps (after publish)
+
+Update every repo that installs the published package to `^<newVersion>` via `pnpm add @vuthanhthien99/<pkg>@^X.Y.Z`, then quality-gate, commit (`chore(deps): bump @vuthanhthien99/<pkg> to ^X.Y.Z`), and push.
+
+| Package | Consumers |
+|---------|-----------|
+| `@vuthanhthien99/sdk` | mfe-shell, mfe-landing, mfe-remote-admin, mfe-remote-product, mfe-remote-formengine, mfe-remote-vue |
+| `@vuthanhthien99/ui` | mfe-shell, mfe-landing, mfe-remote-admin, mfe-remote-product |
+| `@vuthanhthien99/interfaces` | mfe-backend, mfe-remote-admin, mfe-remote-product, mfe-remote-formengine, mfe-remote-vue |
+| `@vuthanhthien99/eform` | mfe-remote-formengine |
+
+Only bump consumers of packages that were actually published in this push.
+
+## Report back
+
+Per repo: dirty? → gates → commit hash → pushed? For shared: versions + tags + publish OK + which consumers bumped.
